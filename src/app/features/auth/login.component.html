@@ -1,0 +1,74 @@
+<div class="login-container">
+  <div class="login-box">
+    <div class="login-header">
+      <h1>Smart Gate System</h1>
+      <p>Customer Portal</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <mat-form-field class="full-width">
+        <mat-label>Username</mat-label>
+        <input 
+          matInput 
+          formControlName="username" 
+          placeholder="Enter your username"
+          type="text"
+        />
+        <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+          Username is required
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('username')?.hasError('minlength')">
+          Username must be at least 3 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Password</mat-label>
+        <input 
+          matInput 
+          formControlName="password" 
+          placeholder="Enter your password"
+          [type]="showPassword ? 'text' : 'password'"
+        />
+        <button 
+          mat-icon-button 
+          matSuffix 
+          (click)="togglePasswordVisibility()" 
+          type="button"
+        >
+          {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+        </button>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+          Password is required
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+          Password must be at least 6 characters
+        </mat-error>
+      </mat-form-field>
+
+      <div class="remember-me">
+        <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
+      </div>
+
+      <button 
+        mat-raised-button 
+        color="primary" 
+        class="login-button"
+        [disabled]="loginForm.invalid || isLoading"
+        type="submit"
+      >
+        <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading">Signing In...</span>
+      </button>
+
+      <div class="login-footer">
+        <a (click)="goToForgotPassword()" class="forgot-password">Forgot Password?</a>
+      </div>
+    </form>
+
+    <div class="login-info">
+      <p>Enterprise Smart Gate System - Customer Portal v1.0</p>
+    </div>
+  </div>
+</div>

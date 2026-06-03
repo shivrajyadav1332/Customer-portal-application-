@@ -1,0 +1,282 @@
+<div class="dashboard-container" *ngIf="!isLoading; else loading">
+  <!-- KPI Cards -->
+  <div class="kpi-section">
+    <mat-grid-list cols="2" rowHeight="120px" gutterSize="16px">
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Total Vehicles</div>
+              <div class="kpi-value">{{ kpi?.totalVehicles || 0 }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon">🚗</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Inside Plant</div>
+              <div class="kpi-value">{{ kpi?.vehiclesInside || 0 }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon">✅</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Exited Today</div>
+              <div class="kpi-value">{{ kpi?.vehiclesExitedToday || 0 }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon">⏳</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Pending</div>
+              <div class="kpi-value">{{ kpi?.pendingVehicles || 0 }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon">⚖️</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Total Weight</div>
+              <div class="kpi-value">{{ kpi?.todaysTotalWeight || 0 }} kg</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+
+      <mat-grid-tile>
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-content">
+              <div class="kpi-label">Avg Weight</div>
+              <div class="kpi-value">{{ kpi?.averageVehicleWeight || 0 }} kg</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </div>
+
+  <!-- Smart Gate Monitoring Section -->
+  <div class="smart-gate-section">
+    <div class="section-header">
+      <h2>
+        <mat-icon>sensors</mat-icon>
+        Smart Gate Operations
+      </h2>
+    </div>
+
+    <!-- Row 1: Gate Signal, Barrier, ANPR -->
+    <div class="smart-gate-grid row-1">
+      <div class="grid-item">
+        <app-signal-monitor></app-signal-monitor>
+      </div>
+      <div class="grid-item">
+        <app-barrier-monitor></app-barrier-monitor>
+      </div>
+      <div class="grid-item">
+        <app-anpr-monitor></app-anpr-monitor>
+      </div>
+    </div>
+
+    <!-- Row 2: Cameras and LED Display -->
+    <div class="smart-gate-grid row-2">
+      <div class="grid-item full-width">
+        <app-camera-monitor></app-camera-monitor>
+      </div>
+      <div class="grid-item">
+        <app-led-display></app-led-display>
+      </div>
+    </div>
+
+    <!-- Row 3: Current Vehicle and Weighbridge -->
+    <div class="smart-gate-grid row-3">
+      <div class="grid-item">
+        <app-current-vehicle></app-current-vehicle>
+      </div>
+      <div class="grid-item">
+        <app-weighbridge-monitor></app-weighbridge-monitor>
+      </div>
+    </div>
+
+    <!-- Row 4: Recent Activities -->
+    <div class="smart-gate-grid row-4">
+      <div class="grid-item full-width">
+        <app-activity-log></app-activity-log>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <div class="chart-cards-grid">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Vehicle Entry vs Exit Trend</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p *ngIf="!entryExitChartData" class="loading-text">Loading chart...</p>
+          <div *ngIf="entryExitChartData" class="chart-placeholder">
+            <strong>Chart: Vehicle Entry vs Exit Trend</strong>
+            <div class="trend-stats">
+              <div class="stat-item">
+                <span class="label">Recent Entries:</span>
+                <span class="value">{{ (entryExitChartData?.datasets?.[0]?.data || [])[0] || '-' }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="label">Recent Exits:</span>
+                <span class="value">{{ (entryExitChartData?.datasets?.[1]?.data || [])[0] || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Daily Weight Trend</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p *ngIf="!weightTrendChartData" class="loading-text">Loading chart...</p>
+          <div *ngIf="weightTrendChartData" class="chart-placeholder">
+            <strong>Chart: Daily Weight Trend</strong>
+            <div class="trend-stats">
+              <div class="stat-item">
+                <span class="label">Latest Weight:</span>
+                <span class="value">{{ (weightTrendChartData?.datasets?.[0]?.data || [])[0] || '-' }} kg</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Vehicle Status Distribution</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p *ngIf="!statusDistributionChartData" class="loading-text">Loading chart...</p>
+          <div *ngIf="statusDistributionChartData" class="chart-placeholder">
+            <strong>Chart: Vehicle Status Distribution</strong>
+            <div class="status-breakdown">
+              <div *ngFor="let label of statusDistributionChartData?.labels; let i = index" class="status-item">
+                <span class="label">{{ label }}:</span>
+                <span class="value">{{ (statusDistributionChartData?.datasets?.[0]?.data || [])[i] || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Monthly Statistics</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p *ngIf="!monthlyStatsChartData" class="loading-text">Loading chart...</p>
+          <div *ngIf="monthlyStatsChartData" class="chart-placeholder">
+            <strong>Chart: Monthly Statistics</strong>
+            <div class="monthly-breakdown">
+              <div *ngFor="let label of (monthlyStatsChartData?.labels || []).slice(0, 3)" class="month-item">
+                <span class="label">{{ label }}:</span>
+                <span class="value">{{ label }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Tables Section -->
+  <div class="tables-section">
+    <mat-tab-group>
+      <mat-tab label="Recent Vehicle Activity">
+        <table class="data-table" *ngIf="dashboardData?.recentActivities?.length! > 0">
+          <thead>
+            <tr>
+              <th>Vehicle #</th>
+              <th>Driver</th>
+              <th>Entry Time</th>
+              <th>Exit Time</th>
+              <th>Status</th>
+              <th>Net Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let element of dashboardData?.recentActivities || []">
+              <td>{{ element.vehicleNumber }}</td>
+              <td>{{ element.driverName }}</td>
+              <td>{{ element.entryTime | date:'short' }}</td>
+              <td>{{ element.exitTime | date:'short' }}</td>
+              <td>
+                <span class="status-badge" [class]="element.status.toLowerCase()">
+                  {{ element.status }}
+                </span>
+              </td>
+              <td>{{ element.netWeight }} kg</td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="!(dashboardData?.recentActivities?.length! > 0)" class="no-data">No recent activities</p>
+      </mat-tab>
+
+      <mat-tab label="Recent Weighbridge Transactions">
+        <table class="data-table" *ngIf="dashboardData?.weighbridgeTransactions?.length! > 0">
+          <thead>
+            <tr>
+              <th>Vehicle #</th>
+              <th>Gross Weight</th>
+              <th>Tare Weight</th>
+              <th>Net Weight</th>
+              <th>Ticket #</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let element of dashboardData?.weighbridgeTransactions || []">
+              <td>{{ element.vehicleNumber }}</td>
+              <td>{{ element.grossWeight }} kg</td>
+              <td>{{ element.tareWeight }} kg</td>
+              <td>{{ element.netWeight }} kg</td>
+              <td>{{ element.ticketNumber }}</td>
+              <td>{{ element.transactionDate | date:'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p *ngIf="!(dashboardData?.weighbridgeTransactions?.length! > 0)" class="no-data">No transactions</p>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <button mat-raised-button color="primary" (click)="refreshDashboard()" class="refresh-button">
+    <mat-icon>refresh</mat-icon>
+    Refresh
+  </button>
+</div>
+
+<ng-template #loading>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading Dashboard...</p>
+  </div>
+</ng-template>

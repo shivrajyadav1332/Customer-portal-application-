@@ -1,0 +1,290 @@
+<div class="settings-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>⚙️ Application Settings</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading settings...</p>
+      </div>
+
+      <div *ngIf="!isLoading" class="settings-content">
+        <mat-tab-group>
+          <!-- Application Settings Tab -->
+          <mat-tab label="Application">
+            <mat-card class="tab-content">
+              <mat-card-header>
+                <mat-card-title>General Application Settings</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form [formGroup]="appSettingsForm" class="form-grid">
+                  <mat-form-field appearance="outline" class="form-full-width">
+                    <mat-label>Company Name</mat-label>
+                    <input matInput formControlName="companyName">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Theme</mat-label>
+                    <mat-select formControlName="theme">
+                      <mat-option value="light">Light</mat-option>
+                      <mat-option value="dark">Dark</mat-option>
+                      <mat-option value="auto">Auto</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Language</mat-label>
+                    <mat-select formControlName="language">
+                      <mat-option value="en">English</mat-option>
+                      <mat-option value="es">Spanish</mat-option>
+                      <mat-option value="fr">French</mat-option>
+                      <mat-option value="de">German</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Timezone</mat-label>
+                    <mat-select formControlName="timezone">
+                      <mat-option value="UTC">UTC</mat-option>
+                      <mat-option value="EST">EST</mat-option>
+                      <mat-option value="CST">CST</mat-option>
+                      <mat-option value="PST">PST</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Date Format</mat-label>
+                    <mat-select formControlName="dateFormat">
+                      <mat-option value="MM/DD/YYYY">MM/DD/YYYY</mat-option>
+                      <mat-option value="DD/MM/YYYY">DD/MM/YYYY</mat-option>
+                      <mat-option value="YYYY-MM-DD">YYYY-MM-DD</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Time Format</mat-label>
+                    <mat-select formControlName="timeFormat">
+                      <mat-option value="12h">12 Hour</mat-option>
+                      <mat-option value="24h">24 Hour</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Currency</mat-label>
+                    <mat-select formControlName="currency">
+                      <mat-option value="USD">USD</mat-option>
+                      <mat-option value="EUR">EUR</mat-option>
+                      <mat-option value="INR">INR</mat-option>
+                      <mat-option value="GBP">GBP</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Session Timeout (minutes)</mat-label>
+                    <input matInput type="number" formControlName="sessionTimeout">
+                  </mat-form-field>
+
+                  <div class="form-actions form-full-width">
+                    <button mat-raised-button color="primary" (click)="saveApplicationSettings()" [disabled]="isSaving">
+                      <mat-icon>save</mat-icon>{{ isSaving ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </mat-tab>
+
+          <!-- Notification Settings Tab -->
+          <mat-tab label="Notifications">
+            <mat-card class="tab-content">
+              <mat-card-header>
+                <mat-card-title>Notification Preferences</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form [formGroup]="notificationSettingsForm" class="form-grid">
+                  <div class="toggle-item">
+                    <label>Email Notifications</label>
+                    <mat-slide-toggle formControlName="emailNotifications"></mat-slide-toggle>
+                  </div>
+
+                  <div class="toggle-item">
+                    <label>Push Notifications</label>
+                    <mat-slide-toggle formControlName="pushNotifications"></mat-slide-toggle>
+                  </div>
+
+                  <div class="toggle-item">
+                    <label>SMS Notifications</label>
+                    <mat-slide-toggle formControlName="smsNotifications"></mat-slide-toggle>
+                  </div>
+
+                  <mat-form-field appearance="outline" class="form-full-width">
+                    <mat-label>Notification Frequency</mat-label>
+                    <mat-select formControlName="notificationFrequency">
+                      <mat-option value="instant">Instant</mat-option>
+                      <mat-option value="hourly">Hourly</mat-option>
+                      <mat-option value="daily">Daily</mat-option>
+                      <mat-option value="weekly">Weekly</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Quiet Hours Start</mat-label>
+                    <input matInput type="time" formControlName="quietHoursStart">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Quiet Hours End</mat-label>
+                    <input matInput type="time" formControlName="quietHoursEnd">
+                  </mat-form-field>
+
+                  <div class="form-actions form-full-width">
+                    <button mat-raised-button color="primary" (click)="saveNotificationSettings()" [disabled]="isSaving">
+                      <mat-icon>save</mat-icon>{{ isSaving ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </mat-tab>
+
+          <!-- Security Settings Tab -->
+          <mat-tab label="Security">
+            <mat-card class="tab-content">
+              <mat-card-header>
+                <mat-card-title>Security Settings</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form [formGroup]="securitySettingsForm" class="form-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Minimum Password Length</mat-label>
+                    <input matInput type="number" formControlName="passwordMinLength">
+                  </mat-form-field>
+
+                  <div class="toggle-item">
+                    <label>Require Uppercase Letters</label>
+                    <mat-slide-toggle formControlName="requireUpperCase"></mat-slide-toggle>
+                  </div>
+
+                  <div class="toggle-item">
+                    <label>Require Numbers</label>
+                    <mat-slide-toggle formControlName="requireNumbers"></mat-slide-toggle>
+                  </div>
+
+                  <div class="toggle-item">
+                    <label>Require Special Characters</label>
+                    <mat-slide-toggle formControlName="requireSpecialChar"></mat-slide-toggle>
+                  </div>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Password Expiry Days</mat-label>
+                    <input matInput type="number" formControlName="passwordExpiryDays">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Max Login Attempts</mat-label>
+                    <input matInput type="number" formControlName="maxLoginAttempts">
+                  </mat-form-field>
+
+                  <div class="toggle-item">
+                    <label>Enable 2-Factor Authentication</label>
+                    <mat-slide-toggle formControlName="enable2FA"></mat-slide-toggle>
+                  </div>
+
+                  <div class="form-actions form-full-width">
+                    <button mat-raised-button color="primary" (click)="saveSecuritySettings()" [disabled]="isSaving">
+                      <mat-icon>save</mat-icon>{{ isSaving ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </mat-tab>
+
+          <!-- API Settings Tab -->
+          <mat-tab label="API">
+            <mat-card class="tab-content">
+              <mat-card-header>
+                <mat-card-title>API Settings</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form [formGroup]="apiSettingsForm" class="form-grid">
+                  <mat-form-field appearance="outline" class="form-full-width">
+                    <mat-label>API Key</mat-label>
+                    <input matInput readonly formControlName="apiKey">
+                  </mat-form-field>
+
+                  <div class="form-full-width">
+                    <button mat-raised-button (click)="generateNewAPIKey()">
+                      <mat-icon>refresh</mat-icon>Generate New API Key
+                    </button>
+                  </div>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Rate Limit (per minute)</mat-label>
+                    <input matInput type="number" formControlName="rateLimitPerMinute">
+                  </mat-form-field>
+
+                  <div class="toggle-item">
+                    <label>Enable Webhooks</label>
+                    <mat-slide-toggle formControlName="enableWebhooks"></mat-slide-toggle>
+                  </div>
+
+                  <mat-form-field appearance="outline" class="form-full-width">
+                    <mat-label>Webhook URL</mat-label>
+                    <input matInput formControlName="webhookUrl">
+                  </mat-form-field>
+
+                  <div class="form-actions form-full-width">
+                    <button mat-raised-button color="primary" (click)="saveAPISettings()" [disabled]="isSaving">
+                      <mat-icon>save</mat-icon>{{ isSaving ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </mat-tab>
+
+          <!-- System Info Tab -->
+          <mat-tab label="System">
+            <mat-card class="tab-content">
+              <mat-card-header>
+                <mat-card-title>System Information</mat-card-title>
+              </mat-card-header>
+              <mat-card-content *ngIf="systemInfo" class="system-info">
+                <div class="info-row">
+                  <span class="label">Version:</span>
+                  <span class="value">{{ systemInfo.version }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Build Date:</span>
+                  <span class="value">{{ systemInfo.buildDate | date: 'medium' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Database:</span>
+                  <span class="value">{{ systemInfo.database }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Server:</span>
+                  <span class="value">{{ systemInfo.server }}</span>
+                </div>
+
+                <div class="actions-section">
+                  <h3>Maintenance</h3>
+                  <div class="button-group">
+                    <button mat-raised-button (click)="exportSettings()">
+                      <mat-icon>download</mat-icon>Export Settings
+                    </button>
+                    <button mat-raised-button color="warn" (click)="resetToDefaults()">
+                      <mat-icon>refresh</mat-icon>Reset to Defaults
+                    </button>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

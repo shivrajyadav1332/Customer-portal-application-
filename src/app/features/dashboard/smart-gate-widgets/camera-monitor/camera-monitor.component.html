@@ -1,0 +1,60 @@
+<mat-card class="smart-gate-card camera-monitor-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">videocam</mat-icon>
+            Live Camera Monitoring
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="cameras.length > 0; else noData">
+        <div class="camera-grid">
+            <div class="camera-item" *ngFor="let camera of cameras">
+                <div class="camera-card">
+                    <!-- Camera Snapshot -->
+                    <div class="snapshot-container">
+                        <img [src]="camera.lastSnapshot || getPlaceholderImage()" [alt]="camera.name" class="snapshot"
+                            [class.offline]="camera.status === 'OFFLINE'">
+                        <div class="status-overlay">
+                            <mat-icon [style.color]="getStatusColor(camera.status)" class="status-icon">
+                                {{ getStatusIcon(camera.status) }}
+                            </mat-icon>
+                            <span class="status-text">{{ camera.status }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Camera Info -->
+                    <div class="camera-info">
+                        <div class="camera-name">{{ camera.name }}</div>
+                        <div class="camera-details">
+                            <div class="detail">
+                                <span class="label">Location:</span>
+                                <span class="value">{{ camera.location }}</span>
+                            </div>
+                            <div class="detail" *ngIf="camera.snapshotTimestamp">
+                                <span class="label">Last Updated:</span>
+                                <span class="value">{{ formatTime(camera.snapshotTimestamp) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Camera Controls -->
+                        <div class="camera-controls">
+                            <button mat-stroked-button (click)="refreshSnapshot(camera.cameraId)"
+                                [disabled]="isRefreshing || camera.status === 'OFFLINE'" class="refresh-btn">
+                                <mat-icon *ngIf="!isRefreshing" class="icon">refresh</mat-icon>
+                                <mat-spinner *ngIf="isRefreshing" diameter="16" class="spinner"></mat-spinner>
+                                <span>{{ isRefreshing ? 'Capturing...' : 'Capture' }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+
+    <ng-template #noData>
+        <mat-card-content class="loading">
+            <mat-icon>videocam_off</mat-icon>
+            <p>No cameras available</p>
+        </mat-card-content>
+    </ng-template>
+</mat-card>

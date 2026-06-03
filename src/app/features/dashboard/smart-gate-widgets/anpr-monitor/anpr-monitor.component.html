@@ -1,0 +1,80 @@
+<mat-card class="smart-gate-card anpr-monitor-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">directions_car</mat-icon>
+            ANPR Vehicle Detection
+        </mat-card-title>
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="toggleHistory()">
+                <mat-icon>history</mat-icon>
+                <span>{{ showHistory ? 'Hide' : 'Show' }} History</span>
+            </button>
+        </mat-menu>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="latestDetection; else noData">
+        <!-- Latest Detection -->
+        <div class="detection-card">
+            <div class="plate-highlight">
+                {{ latestDetection.licensePlate }}
+            </div>
+
+            <div class="detection-details">
+                <div class="detail-row">
+                    <span class="detail-label">Detection Time:</span>
+                    <span class="detail-value">{{ formatTime(latestDetection.detectionTime) }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Location:</span>
+                    <span class="status-badge" [ngClass]="getLocationBadgeClass(latestDetection.gateLocation)">
+                        {{ latestDetection.gateLocation }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="status-badge" [ngClass]="getStatusBadgeClass(latestDetection.detectionStatus)">
+                        {{ latestDetection.detectionStatus }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Confidence:</span>
+                    <span class="confidence">{{ getConfidencePercentage(latestDetection.confidence) }}%</span>
+                </div>
+            </div>
+
+            <div class="confidence-bar">
+                <div class="confidence-fill" [style.width.%]="getConfidencePercentage(latestDetection.confidence)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Detection History -->
+        <div class="detection-history" *ngIf="showHistory && detectionHistory.length > 0">
+            <div class="history-header">Recent Detections</div>
+            <mat-list>
+                <mat-list-item *ngFor="let detection of detectionHistory.slice(0, 5)">
+                    <div class="history-item">
+                        <div class="history-plate">{{ detection.licensePlate }}</div>
+                        <div class="history-time">{{ formatTime(detection.detectionTime) }}</div>
+                        <span class="status-badge" [ngClass]="getStatusBadgeClass(detection.detectionStatus)">
+                            {{ detection.detectionStatus }}
+                        </span>
+                    </div>
+                </mat-list-item>
+            </mat-list>
+        </div>
+    </mat-card-content>
+
+    <ng-template #noData>
+        <mat-card-content class="loading">
+            <mat-icon>search</mat-icon>
+            <p>No detection data available</p>
+        </mat-card-content>
+    </ng-template>
+</mat-card>

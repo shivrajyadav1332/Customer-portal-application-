@@ -1,0 +1,19 @@
+<mat-card class="kpi-card">
+    <mat-card-content class="kpi-content">
+        <div class="kpi-icon-container">
+            <mat-icon class="kpi-icon">{{ icon }}</mat-icon>
+        </div>
+
+        <div class="kpi-info">
+            <div class="kpi-label">{{ title }}</div>
+            <div class="kpi-value">
+                {{ value }}<span *ngIf="unit" class="kpi-unit">{{ unit }}</span>
+            </div>
+            <div *ngIf="trend !== undefined" class="kpi-trend" [class.positive]="trend > 0"
+                [class.negative]="trend < 0">
+                <mat-icon>{{ trendIcon }}</mat-icon>
+                <span>{{ trend }}%</span>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

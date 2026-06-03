@@ -1,0 +1,150 @@
+<div class="reports-container">
+  <!-- Header Card with Stats -->
+  <mat-card class="stats-card">
+    <mat-card-header>
+      <mat-card-title>⚖️ Weighbridge Reports</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{ weighbridgeStats.totalWeighing }}</div>
+          <div class="stat-label">Total Weighings</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ weighbridgeStats.totalGrossWeight / 1000 | number: '1.0-0' }}T</div>
+          <div class="stat-label">Total Gross Weight</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ weighbridgeStats.averageGrossWeight / 1000 | number: '1.0-0' }}T</div>
+          <div class="stat-label">Avg Gross Weight</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ weighbridgeStats.totalNetWeight / 1000 | number: '1.0-0' }}T</div>
+          <div class="stat-label">Total Net Weight</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Search and Filter Card -->
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="search-filter-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search by Vehicle, Ticket or Driver</mat-label>
+          <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+          <mat-icon matSuffix (click)="onSearch()">search</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="onSearch()">
+          <mat-icon>search</mat-icon>Search
+        </button>
+
+        <button mat-raised-button (click)="clearSearch()" [disabled]="!searchQuery">
+          <mat-icon>clear</mat-icon>Clear
+        </button>
+
+        <button mat-raised-button color="accent" (click)="exportReports('excel')">
+          <mat-icon>file_download</mat-icon>Excel
+        </button>
+
+        <button mat-raised-button color="accent" (click)="exportReports('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>PDF
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Reports Table Card -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Weighbridge Transactions</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading reports...</p>
+      </div>
+
+      <div *ngIf="!isLoading && reports.length === 0" class="empty-state">
+        <mat-icon>note</mat-icon>
+        <p>No reports found</p>
+      </div>
+
+      <div *ngIf="!isLoading && reports.length > 0" class="table-wrapper">
+        <table mat-table [dataSource]="reports" class="reports-table">
+          <!-- Ticket Number Column -->
+          <ng-container matColumnDef="ticketNumber">
+            <th mat-header-cell *matHeaderCellDef>Ticket #</th>
+            <td mat-cell *matCellDef="let element"><strong>{{ element.ticketNumber }}</strong></td>
+          </ng-container>
+
+          <!-- Vehicle Number Column -->
+          <ng-container matColumnDef="vehicleNumber">
+            <th mat-header-cell *matHeaderCellDef>Vehicle #</th>
+            <td mat-cell *matCellDef="let element">{{ element.vehicleNumber }}</td>
+          </ng-container>
+
+          <!-- Driver Name Column -->
+          <ng-container matColumnDef="driverName">
+            <th mat-header-cell *matHeaderCellDef>Driver</th>
+            <td mat-cell *matCellDef="let element">{{ element.driverName }}</td>
+          </ng-container>
+
+          <!-- Vehicle Type Column -->
+          <ng-container matColumnDef="vehicleType">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let element">{{ element.vehicleType }}</td>
+          </ng-container>
+
+          <!-- Gross Weight Column -->
+          <ng-container matColumnDef="grossWeight">
+            <th mat-header-cell *matHeaderCellDef>Gross (kg)</th>
+            <td mat-cell *matCellDef="let element">{{ element.grossWeight | number }}</td>
+          </ng-container>
+
+          <!-- Tare Weight Column -->
+          <ng-container matColumnDef="tareWeight">
+            <th mat-header-cell *matHeaderCellDef>Tare (kg)</th>
+            <td mat-cell *matCellDef="let element">{{ element.tareWeight | number }}</td>
+          </ng-container>
+
+          <!-- Net Weight Column -->
+          <ng-container matColumnDef="netWeight">
+            <th mat-header-cell *matHeaderCellDef>Net (kg)</th>
+            <td mat-cell *matCellDef="let element">
+              <strong>{{ element.netWeight | number }}</strong>
+            </td>
+          </ng-container>
+
+          <!-- Transaction Date Column -->
+          <ng-container matColumnDef="transactionDate">
+            <th mat-header-cell *matHeaderCellDef>Date/Time</th>
+            <td mat-cell *matCellDef="let element">{{ element.transactionDate | date: 'medium' }}</td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button (click)="printSlip(element)" matTooltip="Print Slip">
+                <mat-icon>print</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Paginator -->
+        <mat-paginator
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          (page)="onPageChange($event)">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

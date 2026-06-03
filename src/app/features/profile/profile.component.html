@@ -1,0 +1,241 @@
+<div class="profile-layout">
+  <div class="profile-container" *ngIf="!isLoading; else loading">
+    <!-- Page Title -->
+    <div class="page-header">
+      <h1>My Profile</h1>
+      <p>Manage your account and customer information</p>
+    </div>
+
+    <!-- Customer Information Section -->
+    <div *ngIf="currentUser" class="profile-grid">
+      <!-- Main Profile Card -->
+      <mat-card class="profile-header-card">
+        <mat-card-content class="profile-header-content">
+          <div class="profile-avatar">
+            <mat-icon class="avatar-icon">account_circle</mat-icon>
+          </div>
+
+          <div class="profile-summary">
+            <div class="profile-name">
+              <h2>{{ currentUser.firstName }} {{ currentUser.lastName }}</h2>
+              <p class="username">@{{ currentUser.username }}</p>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="profile-grid-2col">
+              <div class="info-item">
+                <span class="label">Email</span>
+                <span class="value">{{ currentUser.email }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Role</span>
+                <mat-chip>{{ currentUser.role | uppercase }}</mat-chip>
+              </div>
+              <div class="info-item">
+                <span class="label">Customer Name</span>
+                <span class="value">{{ currentUser.customerName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Customer ID</span>
+                <span class="value">{{ currentUser.customerId }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Status</span>
+                <mat-chip [class.active]="currentUser.isActive" [class.inactive]="!currentUser.isActive">
+                  {{ currentUser.isActive ? 'Active' : 'Inactive' }}
+                </mat-chip>
+              </div>
+              <div class="info-item" *ngIf="currentUser.permissions && currentUser.permissions.length">
+                <span class="label">Permissions</span>
+                <div class="permissions-list">
+                  <mat-chip *ngFor="let perm of currentUser.permissions">{{ perm }}</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Account Details Card -->
+      <mat-card class="details-card">
+        <mat-card-header>
+          <mat-card-title>Account Details</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="details-grid">
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>person</mat-icon>
+                First Name
+              </span>
+              <span class="value">{{ currentUser.firstName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>person</mat-icon>
+                Last Name
+              </span>
+              <span class="value">{{ currentUser.lastName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>email</mat-icon>
+                Email Address
+              </span>
+              <span class="value">{{ currentUser.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>business</mat-icon>
+                Company/Customer
+              </span>
+              <span class="value">{{ currentUser.customerName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>id_card</mat-icon>
+                Customer ID
+              </span>
+              <span class="value">{{ currentUser.customerId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">
+                <mat-icon>security</mat-icon>
+                Role
+              </span>
+              <span class="value">{{ currentUser.role | titlecase }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Profile Tabs -->
+    <mat-tab-group *ngIf="profile" class="profile-tabs">
+      <!-- Profile Information Tab -->
+      <mat-tab label="Profile Information">
+        <mat-card class="tab-content">
+          <mat-card-header>
+            <mat-card-title>Edit Profile</mat-card-title>
+            <mat-card-subtitle>Update your personal information</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="profileForm" class="form-grid">
+              <mat-form-field appearance="outline" class="form-full-width">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-full-width">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-full-width">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-full-width">
+                <mat-label>Phone</mat-label>
+                <input matInput formControlName="phone">
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-raised-button color="primary" (click)="updateProfile()" [disabled]="isSaving">
+                  <mat-icon *ngIf="!isSaving">save</mat-icon>
+                  <mat-icon *ngIf="isSaving">hourglass_empty</mat-icon>
+                  {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <!-- Change Password Tab -->
+      <mat-tab label="Change Password">
+        <mat-card class="tab-content">
+          <mat-card-header>
+            <mat-card-title>Change Password</mat-card-title>
+            <mat-card-subtitle>Update your password for security</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="passwordForm" class="form-grid">
+              <mat-form-field appearance="outline" class="form-full-width">
+                <mat-label>Current Password</mat-label>
+                <input matInput type="password" formControlName="oldPassword">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-full-width">
+                <mat-label>New Password</mat-label>
+                <input matInput type="password" formControlName="newPassword">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-full-width">
+                <mat-label>Confirm Password</mat-label>
+                <input matInput type="password" formControlName="confirmPassword">
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button mat-raised-button color="primary" (click)="changePassword()"
+                  [disabled]="isSaving || !passwordForm.valid">
+                  <mat-icon>vpn_key</mat-icon>
+                  {{ isSaving ? 'Updating...' : 'Update Password' }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+
+      <!-- Activity Log Tab -->
+      <mat-tab label="Activity Log">
+        <mat-card class="tab-content">
+          <mat-card-header>
+            <mat-card-title>Recent Activity</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="activityLogs" class="activity-table">
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef>Action</th>
+                <td mat-cell *matCellDef="let element">{{ element.action }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef>Description</th>
+                <td mat-cell *matCellDef="let element">{{ element.description }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="timestamp">
+                <th mat-header-cell *matHeaderCellDef>Time</th>
+                <td mat-cell *matCellDef="let element">{{ element.timestamp | date: 'medium' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="ipAddress">
+                <th mat-header-cell *matHeaderCellDef>IP Address</th>
+                <td mat-cell *matCellDef="let element">{{ element.ipAddress }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+            <mat-paginator [length]="totalLogs" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25]"
+              (page)="onPageChange($event)">
+            </mat-paginator>
+          </mat-card-content>
+        </mat-card>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <!-- Loading State -->
+  <ng-template #loading>
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading profile...</p>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,194 @@
+@import '../smart-gate-widgets.scss';
+
+.anpr-monitor-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-left: 4px solid #1976d2;
+
+    mat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 12px;
+
+        mat-card-title {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0;
+
+            .header-icon {
+                margin-right: 12px;
+                color: $primary-color;
+            }
+        }
+    }
+
+    .detection-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 16px;
+
+        .plate-highlight {
+            background-color: #000;
+            color: #ffeb3b;
+            font-family: 'Courier New', monospace;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 16px;
+            border-radius: 4px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 2px solid #ffeb3b;
+        }
+
+        .detection-details {
+            background: white;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 12px;
+
+            .detail-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid #eceff1;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .detail-label {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: $text-secondary;
+                    min-width: 120px;
+                }
+
+                .detail-value {
+                    font-size: 13px;
+                    color: $text-primary;
+                    font-weight: 500;
+                }
+
+                .status-badge {
+                    margin-left: auto;
+                }
+
+                .confidence {
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: $success-color;
+                }
+            }
+        }
+
+        .confidence-bar {
+            background-color: #eceff1;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+
+            .confidence-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #43a047 0%, #7cb342 100%);
+                transition: width 0.3s ease;
+            }
+        }
+    }
+
+    .detection-history {
+        background: #f8f9fa;
+        border-radius: 4px;
+        padding: 16px;
+        margin-top: 16px;
+
+        .history-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: $text-secondary;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid $border-color;
+        }
+
+        mat-list {
+            padding: 0;
+
+            mat-list-item {
+                height: auto;
+                padding: 8px 0;
+                border-bottom: 1px solid $border-color;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .history-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    width: 100%;
+
+                    .history-plate {
+                        font-family: 'Courier New', monospace;
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #000;
+                        background-color: #ffeb3b;
+                        padding: 4px 8px;
+                        border-radius: 3px;
+                        min-width: 80px;
+                        text-align: center;
+                    }
+
+                    .history-time {
+                        font-size: 12px;
+                        color: $text-secondary;
+                        min-width: 70px;
+                    }
+
+                    .status-badge {
+                        margin-left: auto;
+                    }
+                }
+            }
+        }
+    }
+
+    .loading {
+        text-align: center;
+        padding: 24px;
+        color: $text-secondary;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+
+        mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            color: #ccc;
+        }
+    }
+
+    .location-entry {
+        background-color: rgba(67, 160, 71, 0.12) !important;
+        color: $success-color !important;
+    }
+
+    .location-exit {
+        background-color: rgba(251, 140, 0, 0.12) !important;
+        color: $warning-color !important;
+    }
+}

@@ -1,0 +1,66 @@
+<mat-card class="smart-gate-card barrier-monitor-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">compare_arrows</mat-icon>
+            Barrier Monitoring
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="barrierStatus">
+        <div class="barrier-container">
+            <!-- Entry Barrier -->
+            <div class="barrier-group">
+                <div class="barrier-label">Entry Barrier</div>
+                <div class="barrier-status" [style.color]="getBarrierColor(barrierStatus.entryBarrier)">
+                    <mat-icon class="barrier-icon" [style.color]="getBarrierColor(barrierStatus.entryBarrier)">
+                        {{ getBarrierIcon(barrierStatus.entryBarrier) }}
+                    </mat-icon>
+                    <div class="barrier-text">{{ barrierStatus.entryBarrier }}</div>
+                </div>
+                <div class="barrier-controls">
+                    <button mat-stroked-button (click)="openEntryBarrier()"
+                        [disabled]="isLoading || barrierStatus.entryBarrier === 'OPEN' || barrierStatus.entryBarrier === 'OPENING'"
+                        class="control-btn">
+                        <mat-spinner *ngIf="isLoading" diameter="16" class="spinner"></mat-spinner>
+                        <span *ngIf="!isLoading">Open</span>
+                    </button>
+                    <button mat-stroked-button (click)="closeEntryBarrier()"
+                        [disabled]="isLoading || barrierStatus.entryBarrier === 'CLOSED' || barrierStatus.entryBarrier === 'CLOSING'"
+                        class="control-btn danger">
+                        <mat-spinner *ngIf="isLoading" diameter="16" class="spinner"></mat-spinner>
+                        <span *ngIf="!isLoading">Close</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exit Barrier -->
+            <div class="barrier-group">
+                <div class="barrier-label">Exit Barrier</div>
+                <div class="barrier-status" [style.color]="getBarrierColor(barrierStatus.exitBarrier)">
+                    <mat-icon class="barrier-icon" [style.color]="getBarrierColor(barrierStatus.exitBarrier)">
+                        {{ getBarrierIcon(barrierStatus.exitBarrier) }}
+                    </mat-icon>
+                    <div class="barrier-text">{{ barrierStatus.exitBarrier }}</div>
+                </div>
+                <div class="barrier-controls">
+                    <button mat-stroked-button (click)="openExitBarrier()"
+                        [disabled]="isLoading || barrierStatus.exitBarrier === 'OPEN' || barrierStatus.exitBarrier === 'OPENING'"
+                        class="control-btn">
+                        <mat-spinner *ngIf="isLoading" diameter="16" class="spinner"></mat-spinner>
+                        <span *ngIf="!isLoading">Open</span>
+                    </button>
+                    <button mat-stroked-button (click)="closeExitBarrier()"
+                        [disabled]="isLoading || barrierStatus.exitBarrier === 'CLOSED' || barrierStatus.exitBarrier === 'CLOSING'"
+                        class="control-btn danger">
+                        <mat-spinner *ngIf="isLoading" diameter="16" class="spinner"></mat-spinner>
+                        <span *ngIf="!isLoading">Close</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+
+    <mat-card-content *ngIf="!barrierStatus" class="loading">
+        <p>Loading barrier data...</p>
+    </mat-card-content>
+</mat-card>

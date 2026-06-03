@@ -1,0 +1,67 @@
+<mat-card class="smart-gate-card weighbridge-monitor-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">scale</mat-icon>
+            Weighbridge Monitoring
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="weighbridge; else noData">
+        <!-- Weight Display -->
+        <div class="weight-display">
+            <div class="current-weight">
+                <div class="label">Current Weight</div>
+                <div class="value">{{ formatWeight(weighbridge.currentWeight) }}</div>
+                <div class="unit">{{ weighbridge.unit }}</div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="weight-progress">
+            <mat-progress-bar mode="determinate" [value]="getProgressPercentage()"
+                [color]="weighbridge.status === 'WEIGHING' ? 'warn' : 'primary'">
+            </mat-progress-bar>
+            <div class="progress-labels">
+                <span class="min">0</span>
+                <span class="percentage">{{ getProgressPercentage() | number:'1.0-0' }}%</span>
+                <span class="max">{{ maxWeight | number }} {{ weighbridge.unit }}</span>
+            </div>
+        </div>
+
+        <!-- Weight Details -->
+        <div class="weight-details">
+            <div class="detail-item">
+                <div class="detail-label">Gross Weight</div>
+                <div class="detail-value">{{ formatWeight(weighbridge.grossWeight) }} {{ weighbridge.unit }}</div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Tare Weight</div>
+                <div class="detail-value">{{ formatWeight(weighbridge.tareWeight) }} {{ weighbridge.unit }}</div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Net Weight</div>
+                <div class="detail-value">{{ formatWeight(weighbridge.netWeight) }} {{ weighbridge.unit }}</div>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="weighbridge-status">
+            <div class="status-indicator" [style.color]="getStatusColor(weighbridge.status)">
+                <mat-icon class="status-icon">{{ getStatusIcon(weighbridge.status) }}</mat-icon>
+                <span class="status-text">{{ weighbridge.status }}</span>
+            </div>
+            <div class="timestamp">
+                Last Updated: {{ formatTime(weighbridge.lastUpdated) }}
+            </div>
+        </div>
+    </mat-card-content>
+
+    <ng-template #noData>
+        <mat-card-content class="loading">
+            <mat-icon>balance</mat-icon>
+            <p>No weighbridge data available</p>
+        </mat-card-content>
+    </ng-template>
+</mat-card>

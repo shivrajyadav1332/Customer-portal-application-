@@ -1,0 +1,102 @@
+<mat-card class="smart-gate-card current-vehicle-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">directions_car</mat-icon>
+            Current Vehicle Status
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="currentVehicle; else noData">
+        <div class="vehicle-info">
+            <!-- Vehicle Number (Highlight) -->
+            <div class="vehicle-plate">
+                {{ currentVehicle.vehicleNumber }}
+            </div>
+
+            <!-- Status Badge -->
+            <div class="status-section">
+                <div class="status-badge" [style.background-color]="getStatusColor(currentVehicle.status)"
+                    [style.color]="'white'">
+                    <mat-icon>{{ getStatusIcon(currentVehicle.status) }}</mat-icon>
+                    <span>{{ getStatusText(currentVehicle.status) }}</span>
+                </div>
+            </div>
+
+            <!-- Vehicle Details Grid -->
+            <div class="details-grid">
+                <!-- Driver Name -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <mat-icon>person</mat-icon>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-label">Driver Name</div>
+                        <div class="detail-value">{{ currentVehicle.driverName || 'N/A' }}</div>
+                    </div>
+                </div>
+
+                <!-- Material Type -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <mat-icon>category</mat-icon>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-label">Material</div>
+                        <div class="detail-value">{{ currentVehicle.material || 'N/A' }}</div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Type -->
+                <div class="detail-card" *ngIf="currentVehicle.vehicleType">
+                    <div class="detail-icon">
+                        <mat-icon>directions_car</mat-icon>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-label">Vehicle Type</div>
+                        <div class="detail-value">{{ currentVehicle.vehicleType }}</div>
+                    </div>
+                </div>
+
+                <!-- Entry Time -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <mat-icon>access_time</mat-icon>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-label">Entry Time</div>
+                        <div class="detail-value">{{ formatTime(currentVehicle.entryTime) }}</div>
+                    </div>
+                </div>
+
+                <!-- Current Weight -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <mat-icon>scale</mat-icon>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-label">Current Weight</div>
+                        <div class="detail-value">{{ formatWeight(currentVehicle.currentWeight) }} kg</div>
+                    </div>
+                </div>
+
+                <!-- Driver ID -->
+                <div class="detail-card" *ngIf="currentVehicle.driverId">
+                    <div class="detail-icon">
+                        <mat-icon>badge</mat-icon>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-label">Driver ID</div>
+                        <div class="detail-value">{{ currentVehicle.driverId }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+
+    <ng-template #noData>
+        <mat-card-content class="loading">
+            <mat-icon>no_meeting_room</mat-icon>
+            <p>No vehicle currently active</p>
+        </mat-card-content>
+    </ng-template>
+</mat-card>

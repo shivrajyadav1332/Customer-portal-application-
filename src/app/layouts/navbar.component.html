@@ -1,0 +1,57 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="goToDashboard()" class="logo-button">
+    <span class="logo-text">🚛 Smart Gate</span>
+  </button>
+
+  <span class="spacer"></span>
+
+  <div class="navbar-actions">
+    <button 
+      mat-icon-button 
+      [matMenuTriggerFor]="notificationMenu"
+      [matBadge]="unreadNotificationCount"
+      matBadgeColor="warn"
+      [matBadgeHidden]="unreadNotificationCount === 0"
+      class="notification-button"
+      title="Notifications"
+    >
+      <mat-icon>notifications</mat-icon>
+    </button>
+
+    <button 
+      mat-icon-button 
+      [matMenuTriggerFor]="userMenu"
+      class="user-button"
+    >
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>
+
+<mat-menu #notificationMenu="matMenu" class="notification-menu">
+  <button mat-menu-item (click)="goToNotifications()">
+    <mat-icon>notifications_active</mat-icon>
+    <span>View All Notifications ({{ unreadNotificationCount }})</span>
+  </button>
+</mat-menu>
+
+<mat-menu #userMenu="matMenu" class="user-menu">
+  <div class="user-info" *ngIf="currentUser">
+    <div class="user-name">{{ currentUser.firstName }} {{ currentUser.lastName }}</div>
+    <div class="user-email">{{ currentUser.email }}</div>
+  </div>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="goToProfile()">
+    <mat-icon>person</mat-icon>
+    <span>Profile</span>
+  </button>
+  <button mat-menu-item>
+    <mat-icon>settings</mat-icon>
+    <span>Settings</span>
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>Logout</span>
+  </button>
+</mat-menu>

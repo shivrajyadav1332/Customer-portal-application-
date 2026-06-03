@@ -1,0 +1,52 @@
+<mat-card class="smart-gate-card activity-log-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">history</mat-icon>
+            Recent Gate Activities
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="recentActivities.length > 0; else noData">
+        <div class="timeline">
+            <div class="timeline-item" *ngFor="let activity of recentActivities; let last = last">
+                <!-- Timeline Dot -->
+                <div class="timeline-dot" [style.background-color]="getActivityColor(activity.activityType)">
+                    <mat-icon>{{ getActivityIcon(activity.activityType) }}</mat-icon>
+                </div>
+
+                <!-- Timeline Connector -->
+                <div class="timeline-connector" *ngIf="!last"></div>
+
+                <!-- Activity Content -->
+                <div class="timeline-content">
+                    <div class="activity-header">
+                        <div class="activity-time">{{ formatTime(activity.timestamp) }}</div>
+                        <span class="status-badge" [ngClass]="getStatusBadgeClass(activity.status)">
+                            {{ activity.status }}
+                        </span>
+                    </div>
+
+                    <div class="activity-description">
+                        {{ getActivityDescription(activity) }}
+                    </div>
+
+                    <div class="activity-type">
+                        {{ activity.activityType.replace(/_/g, ' ') }}
+                    </div>
+
+                    <div class="activity-vehicle" *ngIf="activity.vehicleNumber">
+                        <mat-icon>directions_car</mat-icon>
+                        <span>{{ activity.vehicleNumber }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+
+    <ng-template #noData>
+        <mat-card-content class="loading">
+            <mat-icon>event_note</mat-icon>
+            <p>No recent activities</p>
+        </mat-card-content>
+    </ng-template>
+</mat-card>

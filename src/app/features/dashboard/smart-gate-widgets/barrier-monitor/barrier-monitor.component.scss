@@ -1,0 +1,115 @@
+@import '../smart-gate-widgets.scss';
+
+.barrier-monitor-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-left: 4px solid #00acc1;
+
+    mat-card-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 12px;
+
+        mat-card-title {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-primary;
+
+            .header-icon {
+                margin-right: 12px;
+                color: #00acc1;
+            }
+        }
+    }
+
+    .barrier-container {
+        display: flex;
+        justify-content: space-around;
+        gap: 24px;
+
+        @media (max-width: 600px) {
+            gap: 16px;
+        }
+    }
+
+    .barrier-group {
+        text-align: center;
+        flex: 1;
+
+        .barrier-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: $text-secondary;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .barrier-status {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+
+            .barrier-icon {
+                font-size: 56px;
+                width: 56px;
+                height: 56px;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    transform: scale(1.1);
+                }
+            }
+
+            .barrier-text {
+                font-size: 14px;
+                font-weight: 600;
+                color: $text-primary;
+            }
+        }
+
+        .barrier-controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+
+            .control-btn {
+                flex: 1;
+                min-width: 70px;
+                font-size: 12px;
+                padding: 8px 12px;
+                border-radius: 4px;
+                position: relative;
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                .spinner {
+                    position: absolute;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+
+                &.danger {
+                    color: $danger-color;
+                    border-color: $danger-color;
+
+                    &:hover:not(:disabled) {
+                        background-color: rgba(229, 57, 53, 0.04);
+                    }
+                }
+            }
+        }
+    }
+
+    .loading {
+        text-align: center;
+        padding: 24px;
+        color: $text-secondary;
+    }
+}

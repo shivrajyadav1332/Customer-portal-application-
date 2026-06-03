@@ -1,0 +1,42 @@
+<mat-card class="smart-gate-card signal-monitor-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">traffic</mat-icon>
+            Gate Signal Monitoring
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content *ngIf="gateSignal">
+        <div class="signal-container">
+            <!-- Entry Signal -->
+            <div class="signal-group">
+                <div class="signal-label">Entry Signal</div>
+                <div class="signal-indicator" [ngClass]="getSignalClass(gateSignal.entrySignal)">
+                    <div class="signal-light" [style.background-color]="getSignalColor(gateSignal.entrySignal)">
+                        <div class="signal-pulse"></div>
+                    </div>
+                    <div class="signal-text">{{ gateSignal.entrySignal }}</div>
+                </div>
+            </div>
+
+            <!-- Exit Signal -->
+            <div class="signal-group">
+                <div class="signal-label">Exit Signal</div>
+                <div class="signal-indicator" [ngClass]="getSignalClass(gateSignal.exitSignal)">
+                    <div class="signal-light" [style.background-color]="getSignalColor(gateSignal.exitSignal)">
+                        <div class="signal-pulse"></div>
+                    </div>
+                    <div class="signal-text">{{ gateSignal.exitSignal }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            Last Updated: {{ formatTime(gateSignal.lastUpdated) }}
+        </div>
+    </mat-card-content>
+
+    <mat-card-content *ngIf="!gateSignal" class="loading">
+        <p>Loading signal data...</p>
+    </mat-card-content>
+</mat-card>

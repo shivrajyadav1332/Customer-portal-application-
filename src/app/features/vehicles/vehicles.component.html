@@ -1,0 +1,149 @@
+<div class="vehicles-container">
+  <!-- Header Card with Stats -->
+  <mat-card class="stats-card">
+    <mat-card-header>
+      <mat-card-title>🚛 Vehicle Tracking Dashboard</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{ vehicleStats.total }}</div>
+          <div class="stat-label">Total Vehicles Today</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ vehicleStats.inside }}</div>
+          <div class="stat-label">Inside Plant</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ vehicleStats.onWeighbridge }}</div>
+          <div class="stat-label">On Weighbridge</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ vehicleStats.exited }}</div>
+          <div class="stat-label">Exited</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Search and Filter Card -->
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="search-filter-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search by Vehicle or Driver</mat-label>
+          <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+          <mat-icon matSuffix (click)="onSearch()">search</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="onSearch()">
+          <mat-icon>search</mat-icon>Search
+        </button>
+
+        <button mat-raised-button (click)="clearSearch()" [disabled]="!searchQuery && !selectedStatus">
+          <mat-icon>clear</mat-icon>Clear
+        </button>
+
+        <button mat-raised-button color="accent" (click)="exportData()">
+          <mat-icon>download</mat-icon>Export
+        </button>
+      </div>
+
+      <!-- Status Chips -->
+      <div class="status-chips">
+        <button mat-raised-button [color]="selectedStatus === null ? 'primary' : ''" 
+                (click)="filterByStatus(null)" class="chip-button">
+          All
+        </button>
+        <button *ngFor="let status of statusFilters" mat-raised-button
+                [color]="selectedStatus === status ? 'primary' : ''"
+                (click)="filterByStatus(status)" class="chip-button">
+          {{ status }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Vehicles Table Card -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Active Vehicles</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading vehicles...</p>
+      </div>
+
+      <div *ngIf="!isLoading && vehicles.length === 0" class="empty-state">
+        <mat-icon>directions_car</mat-icon>
+        <p>No vehicles found</p>
+      </div>
+
+      <div *ngIf="!isLoading && vehicles.length > 0" class="table-wrapper">
+        <table mat-table [dataSource]="vehicles" class="vehicles-table">
+          <!-- Vehicle Number Column -->
+          <ng-container matColumnDef="vehicleNumber">
+            <th mat-header-cell *matHeaderCellDef>Vehicle #</th>
+            <td mat-cell *matCellDef="let element"><strong>{{ element.vehicleNumber }}</strong></td>
+          </ng-container>
+
+          <!-- Vehicle Type Column -->
+          <ng-container matColumnDef="vehicleType">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let element">{{ element.vehicleType }}</td>
+          </ng-container>
+
+          <!-- Driver Name Column -->
+          <ng-container matColumnDef="driverName">
+            <th mat-header-cell *matHeaderCellDef>Driver</th>
+            <td mat-cell *matCellDef="let element">{{ element.driverName }}</td>
+          </ng-container>
+
+          <!-- Entry Time Column -->
+          <ng-container matColumnDef="entryTime">
+            <th mat-header-cell *matHeaderCellDef>Entry Time</th>
+            <td mat-cell *matCellDef="let element">{{ element.entryTime | date: 'medium' }}</td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip [ngClass]="getStatusColor(element.status)">
+                {{ element.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Current Weight Column -->
+          <ng-container matColumnDef="currentWeight">
+            <th mat-header-cell *matHeaderCellDef>Weight (kg)</th>
+            <td mat-cell *matCellDef="let element">{{ element.currentWeight | number }}</td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button (click)="viewDetails(element)" matTooltip="View Details">
+                <mat-icon>info</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Paginator -->
+        <mat-paginator
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          (page)="onPageChange($event)">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

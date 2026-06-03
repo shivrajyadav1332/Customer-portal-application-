@@ -1,0 +1,117 @@
+<div class="analytics-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>📊 Analytics Dashboard</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading analytics...</p>
+      </div>
+
+      <div *ngIf="!isLoading && analyticsData" class="analytics-content">
+        <!-- KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-value">{{ analyticsData.totalVehicles }}</div>
+            <div class="kpi-label">Total Vehicles</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value">{{ analyticsData.totalWeight / 1000 | number: '1.0-0' }}T</div>
+            <div class="kpi-label">Total Weight</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value">{{ analyticsData.averageWeightPerVehicle | number }}</div>
+            <div class="kpi-label">Avg Weight/Vehicle</div>
+          </div>
+        </div>
+
+        <!-- Vehicle Type Distribution -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Vehicle Type Distribution</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="type-distribution">
+              <div *ngFor="let item of analyticsData.vehicleTypeDistribution" class="type-item">
+                <div class="type-label">{{ item.type }}: {{ item.count }}</div>
+                <div class="type-bar" [style.width.%]="(item.count / (analyticsData.totalVehicles || 1)) * 100"></div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Top Drivers -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Top Drivers</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="analyticsData.topDrivers" class="analytics-table">
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Driver Name</th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="trips">
+                <th mat-header-cell *matHeaderCellDef>Trips</th>
+                <td mat-cell *matCellDef="let element">{{ element.trips }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="totalWeight">
+                <th mat-header-cell *matHeaderCellDef>Total Weight (kg)</th>
+                <td mat-cell *matCellDef="let element">{{ element.totalWeight | number }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsDrivers"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumnsDrivers;"></tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Vehicle Utilization -->
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title>Vehicle Utilization</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="analyticsData.vehicleUtilization" class="analytics-table">
+              <ng-container matColumnDef="vehicleNumber">
+                <th mat-header-cell *matHeaderCellDef>Vehicle #</th>
+                <td mat-cell *matCellDef="let element">{{ element.vehicleNumber }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="tripCount">
+                <th mat-header-cell *matHeaderCellDef>Trips</th>
+                <td mat-cell *matCellDef="let element">{{ element.tripCount }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="totalWeight">
+                <th mat-header-cell *matHeaderCellDef>Total Weight (kg)</th>
+                <td mat-cell *matCellDef="let element">{{ element.totalWeight | number }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="efficiency">
+                <th mat-header-cell *matHeaderCellDef>Efficiency %</th>
+                <td mat-cell *matCellDef="let element">{{ element.efficiency }}%</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumnsVehicles"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumnsVehicles;"></tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Export Buttons -->
+        <div class="export-buttons">
+          <button mat-raised-button color="primary" (click)="exportReport('pdf')">
+            <mat-icon>picture_as_pdf</mat-icon>Export PDF
+          </button>
+          <button mat-raised-button color="accent" (click)="exportReport('excel')">
+            <mat-icon>file_download</mat-icon>Export Excel
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

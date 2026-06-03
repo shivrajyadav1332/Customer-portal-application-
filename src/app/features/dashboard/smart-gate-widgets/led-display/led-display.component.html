@@ -1,0 +1,44 @@
+<mat-card class="smart-gate-card led-display-card">
+    <mat-card-header>
+        <mat-card-title>
+            <mat-icon class="header-icon">screen_share</mat-icon>
+            LED Display Monitoring
+        </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+        <!-- LED Display Screen -->
+        <div class="led-screen" *ngIf="ledMessage">
+            <div class="led-content">
+                <div class="led-text">{{ ledMessage.message }}</div>
+            </div>
+            <div class="led-timestamp">
+                Updated: {{ formatTime(ledMessage.lastUpdated) }}
+            </div>
+        </div>
+
+        <!-- Update Form -->
+        <div class="led-controls">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Enter LED Message</mat-label>
+                <input matInput [(ngModel)]="newMessage" placeholder="Type your message here..." maxlength="128"
+                    (keyup.enter)="updateMessage()">
+                <mat-hint>{{ getCharacterCount() }}</mat-hint>
+            </mat-form-field>
+
+            <div class="button-group">
+                <button mat-raised-button color="primary" (click)="updateMessage()"
+                    [disabled]="isUpdating || !newMessage.trim()" class="update-btn">
+                    <mat-icon *ngIf="!isUpdating">send</mat-icon>
+                    <span *ngIf="!isUpdating">Update Message</span>
+                    <span *ngIf="isUpdating">Updating...</span>
+                </button>
+
+                <button mat-stroked-button (click)="clearMessage()" [disabled]="isUpdating" class="clear-btn">
+                    <mat-icon>clear</mat-icon>
+                    Clear
+                </button>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

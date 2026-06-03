@@ -1,0 +1,87 @@
+<div class="notifications-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>🔔 Notifications ({{ unreadCount }} Unread)</mat-card-title>
+      <div class="header-buttons">
+        <button mat-raised-button (click)="markAllAsRead()" [disabled]="unreadCount === 0">
+          <mat-icon>done_all</mat-icon>Mark All Read
+        </button>
+        <button mat-raised-button color="warn" (click)="clearAll()" [disabled]="notifications.length === 0">
+          <mat-icon>delete_sweep</mat-icon>Clear All
+        </button>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading notifications...</p>
+      </div>
+
+      <div *ngIf="!isLoading && notifications.length === 0" class="empty-state">
+        <mat-icon>notifications_none</mat-icon>
+        <p>No notifications</p>
+      </div>
+
+      <div *ngIf="!isLoading && notifications.length > 0" class="notifications-list">
+        <div *ngFor="let notification of notifications" class="notification-item" [class.unread]="notification.status === 'Unread'">
+          <div class="notification-header">
+            <strong>{{ notification.title }}</strong>
+            <span class="notification-time">{{ notification.createdAt | date: 'short' }}</span>
+          </div>
+          <div class="notification-message">{{ notification.message }}</div>
+          <div class="notification-actions">
+            <button mat-icon-button (click)="markAsRead(notification)" [disabled]="notification.status === 'Read'">
+              <mat-icon>done</mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteNotification(notification.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <mat-paginator
+        *ngIf="totalCount > 0"
+        [length]="totalCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25]"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Preferences Card -->
+  <mat-card class="preferences-card">
+    <mat-card-header>
+      <mat-card-title>Notification Preferences</mat-card-title>
+    </mat-card-header>
+    <mat-card-content *ngIf="preferences">
+      <div class="preferences-grid">
+        <div class="preference-item">
+          <label>Vehicle Arrived Notifications</label>
+          <mat-slide-toggle [(ngModel)]="preferences.vehicleArrivedEnabled" (change)="updatePreferences()"></mat-slide-toggle>
+        </div>
+        <div class="preference-item">
+          <label>Vehicle Exited Notifications</label>
+          <mat-slide-toggle [(ngModel)]="preferences.vehicleExitedEnabled" (change)="updatePreferences()"></mat-slide-toggle>
+        </div>
+        <div class="preference-item">
+          <label>Weight Captured Notifications</label>
+          <mat-slide-toggle [(ngModel)]="preferences.weightCapturedEnabled" (change)="updatePreferences()"></mat-slide-toggle>
+        </div>
+        <div class="preference-item">
+          <label>System Alerts</label>
+          <mat-slide-toggle [(ngModel)]="preferences.systemAlertsEnabled" (change)="updatePreferences()"></mat-slide-toggle>
+        </div>
+        <div class="preference-item">
+          <label>Email Notifications</label>
+          <mat-slide-toggle [(ngModel)]="preferences.emailNotifications" (change)="updatePreferences()"></mat-slide-toggle>
+        </div>
+        <div class="preference-item">
+          <label>Push Notifications</label>
+          <mat-slide-toggle [(ngModel)]="preferences.pushNotifications" (change)="updatePreferences()"></mat-slide-toggle>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

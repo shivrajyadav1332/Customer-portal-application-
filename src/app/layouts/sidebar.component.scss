@@ -1,0 +1,50 @@
+.sidebar-container {
+  height: calc(100vh - 64px);
+  display: flex;
+
+  .sidebar {
+    width: 250px;
+    background: #fafafa;
+
+    mat-nav-list {
+      padding: 0;
+    }
+
+    h2 {
+      padding: 16px;
+      margin: 0;
+      color: #666;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .menu-item {
+      color: #333;
+      margin: 0 8px;
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.04);
+      }
+
+      &.active {
+        background: #e3f2fd;
+        color: #1976d2;
+
+        mat-icon {
+          color: #1976d2;
+        }
+      }
+    }
+  }
+
+  mat-sidenav-content {
+    flex: 1;
+    overflow-y: auto;
+
+    .toggle-button {
+      margin: 8px;
+    }
+  }
+}

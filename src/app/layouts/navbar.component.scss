@@ -1,0 +1,55 @@
+mat-toolbar {
+  padding: 0 16px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .logo-button {
+    .logo-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      margin-left: 8px;
+    }
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  .navbar-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .notification-button,
+    .user-button {
+      color: white;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .notification-menu,
+  .user-menu {
+    .user-info {
+      padding: 16px;
+      text-align: center;
+
+      .user-name {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .user-email {
+        font-size: 12px;
+        color: #999;
+      }
+    }
+  }
+}

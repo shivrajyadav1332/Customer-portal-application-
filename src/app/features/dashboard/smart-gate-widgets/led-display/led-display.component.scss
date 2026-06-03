@@ -1,0 +1,120 @@
+@import '../smart-gate-widgets.scss';
+
+.led-display-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-left: 4px solid #43a047;
+
+    mat-card-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 12px;
+
+        mat-card-title {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-primary;
+
+            .header-icon {
+                margin-right: 12px;
+                color: #43a047;
+            }
+        }
+    }
+
+    .led-screen {
+        background-color: #000;
+        border: 3px solid #333;
+        border-radius: 4px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2);
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .led-content {
+            .led-text {
+                font-family: 'Courier New', monospace;
+                font-size: 24px;
+                color: #00ff00;
+                font-weight: bold;
+                text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+                letter-spacing: 2px;
+                overflow: hidden;
+                white-space: nowrap;
+                animation: scroll-left 15s linear infinite;
+                line-height: 1.4;
+            }
+        }
+
+        .led-timestamp {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #00aa00;
+            text-align: right;
+            margin-top: 12px;
+            opacity: 0.7;
+        }
+    }
+
+    .led-controls {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 16px;
+
+        .full-width {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+
+            @media (max-width: 600px) {
+                flex-direction: column;
+            }
+
+            .update-btn {
+                flex: 1;
+                min-width: 140px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+
+                mat-icon {
+                    margin-right: 4px;
+                }
+            }
+
+            .clear-btn {
+                flex: 1;
+                min-width: 100px;
+
+                @media (max-width: 600px) {
+                    flex: auto;
+                }
+            }
+        }
+
+        mat-form-field {
+            ::ng-deep .mat-mdc-form-field-hint {
+                font-size: 11px;
+            }
+        }
+    }
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
