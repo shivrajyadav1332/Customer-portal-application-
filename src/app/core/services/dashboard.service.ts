@@ -1,7 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { catchError, delay, map } from 'rxjs/operators';
 import {
   DashboardData,
   DashboardKPI,
@@ -9,14 +9,68 @@ import {
   DashboardNotification,
   MonthlyStats
 } from '../models/dashboard.model';
+import { environment } from '../../../environments/environment';
+
+export interface LiveTruckStatus {
+  currentTruck: string;
+  currentWeight: number;
+  entryBarrier: string;
+  exitBarrier: string;
+  vehicleStatus: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
+  private apiUrl = environment.apiUrl;
+
   constructor(private http: HttpClient) { }
 
   getDashboardData(): Observable<EnhancedDashboardData> {
+    return this.http.get<any>(`${this.apiUrl}/dashboard`).pipe(
+      map((response) => ({
+        summary: {
+          totalVehicles: response.summary?.totalVehicles ?? 0,
+          vehicleEntries: response.summary?.vehicleEntries ?? 0,
+          vehicleExits: response.summary?.vehiclesExitedToday ?? 0,
+          pendingApprovals: response.summary?.pendingVehicles ?? 0,
+          totalWeight: response.summary?.todaysTotalWeight ?? 0,
+          todayWeight: response.summary?.todaysTotalWeight ?? 0
+        },
+        recentActivities: response.recentActivities ?? [],
+        transactions: response.transactions ?? [],
+        notifications: [],
+        vehicleTrend: response.vehicleTrend,
+        weightTrend: response.weightTrend,
+        vehicleStatus: response.vehicleStatus,
+        monthlyStatistics: [],
+        liveStatus: response.liveStatus
+      })),
+      catchError(() => this.getMockDashboardData())
+    );
+  }
+
+  getLiveStatus(): Observable<LiveTruckStatus> {
+    return this.http.get<any>(`${this.apiUrl}/monitoring/live`).pipe(
+      map((response) => ({
+        currentTruck: response.currentTruck,
+        currentWeight: response.currentWeight,
+        entryBarrier: response.entryBarrier,
+        exitBarrier: response.exitBarrier,
+        vehicleStatus: response.vehicleStatus
+      })),
+      catchError(() => of({
+        currentTruck: 'ABC-1234',
+        currentWeight: 28500,
+        entryBarrier: 'OPEN',
+        exitBarrier: 'CLOSED',
+        vehicleStatus: 'INSIDE'
+      }))
+    );
+  }
+
+  private getMockDashboardData(): Observable<EnhancedDashboardData> {
     const mockData: EnhancedDashboardData = {
       summary: {
         totalVehicles: 245,

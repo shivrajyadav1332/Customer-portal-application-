@@ -28,11 +28,40 @@
                 width: auto;
             }
 
+            .brand {
+                display: flex;
+                flex-direction: column;
+                line-height: 1.2;
+            }
+
             .app-title {
-                font-size: 22px;
-                font-weight: 600;
+                font-size: 20px;
+                font-weight: 700;
                 color: white;
-                letter-spacing: 0.5px;
+                letter-spacing: 0.3px;
+            }
+
+            .app-subtitle {
+                font-size: 11px;
+                color: rgba(255, 255, 255, 0.8);
+                font-weight: 500;
+            }
+        }
+
+        .header-center {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            margin-right: 24px;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 14px;
+            font-weight: 500;
+
+            mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
             }
         }
 
@@ -50,6 +79,16 @@
             }
         }
     }
+}
+
+.menu-user-info {
+    padding: 12px 16px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong { font-size: 14px; }
+    small { color: #888; font-size: 12px; }
 }
 
 // Responsive

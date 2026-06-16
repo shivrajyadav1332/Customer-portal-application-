@@ -63,8 +63,12 @@
       .login-footer {
         text-align: center;
         margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
 
-        .forgot-password {
+        .forgot-password,
+        .signup-link {
           color: #667eea;
           text-decoration: none;
           font-size: 14px;
@@ -75,6 +79,11 @@
             color: #764ba2;
             text-decoration: underline;
           }
+        }
+
+        .signup-prompt {
+          color: #666;
+          font-size: 14px;
         }
       }
     }

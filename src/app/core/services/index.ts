@@ -8,3 +8,4 @@ export * from './signalr.service';
 export * from './gate-monitor.service';
 export * from './anpr.service';
 export * from './activity-log.service';
+export * from './scada-api.service';

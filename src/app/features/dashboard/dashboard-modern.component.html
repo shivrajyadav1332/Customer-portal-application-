@@ -1,72 +1,270 @@
-<app-header></app-header>
-<app-sidebar></app-sidebar>
+<div class="dashboard-container" *ngIf="!isLoading; else loading">
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Welcome back, {{ customerName }}! Here's your Yanbu Cement plant overview.</p>
+    </div>
 
-<div class="dashboard-layout">
-    <div class="dashboard-container" *ngIf="!isLoading; else loading">
-        <!-- Page Title -->
-        <div class="page-header">
-            <h1>Dashboard</h1>
-            <p>Welcome back! Here's your smart gate system overview.</p>
-        </div>
-
-        <!-- KPI Cards Section -->
-        <div class="kpi-section">
-            <div class="kpi-grid">
-                <app-kpi-card title="Total Vehicles" [value]="kpi.totalVehicles" icon="directions_car" [trend]="5">
-                </app-kpi-card>
-
-                <app-kpi-card title="Inside Plant" [value]="kpi.vehiclesInside" icon="local_shipping" [trend]="2">
-                </app-kpi-card>
-
-                <app-kpi-card title="Exited Today" [value]="kpi.vehiclesExitedToday" icon="check_circle" [trend]="8">
-                </app-kpi-card>
-
-                <app-kpi-card title="Pending" [value]="kpi.pendingVehicles" icon="schedule" [trend]="-2">
-                </app-kpi-card>
-
-                <app-kpi-card title="Total Weight" [value]="kpi.totalWeight | number:'1.0-0'" icon="scale" unit="KG"
-                    [trend]="3">
-                </app-kpi-card>
-
-                <app-kpi-card title="Avg Weight" [value]="kpi.avgWeight | number:'1.0-2'" icon="trending_up" unit="KG"
-                    [trend]="1">
-                </app-kpi-card>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <!-- Vehicle Entry vs Exit Trend -->
-            <mat-card class="chart-card">
-                <mat-card-header>
-                    <mat-card-title>Vehicle Entry vs Exit Trend</mat-card-title>
-                    <mat-card-subtitle>Weekly comparison</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <canvas baseChart type="line" [data]="entryExitChartData" [options]="entryExitChartOptions">
-                    </canvas>
-                </mat-card-content>
-            </mat-card>
-
-            <!-- Daily Weight Trend -->
-            <mat-card class="chart-card">
-                <mat-card-header>
-                    <mat-card-title>Daily Weight Trend</mat-card-title>
-                    <mat-card-subtitle>Weekly weight distribution</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <canvas baseChart type="line" [data]="weightTrendChartData" [options]="weightTrendChartOptions">
-                    </canvas>
-                </mat-card-content>
-            </mat-card>
+    <div class="kpi-section">
+        <div class="kpi-grid">
+            <app-kpi-card title="Total Vehicles" [value]="kpi.totalVehicles" icon="directions_car" [trend]="5"></app-kpi-card>
+            <app-kpi-card title="Vehicles Inside Plant" [value]="kpi.vehiclesInside" icon="local_shipping" [trend]="2"></app-kpi-card>
+            <app-kpi-card title="Exited Today" [value]="kpi.vehiclesExitedToday" icon="check_circle" [trend]="8"></app-kpi-card>
+            <app-kpi-card title="Today's Total Weight" [value]="todayWeightTons" icon="scale" unit="Tons" [trend]="3"></app-kpi-card>
+            <app-kpi-card title="Pending Vehicles" [value]="kpi.pendingVehicles" icon="schedule" [trend]="-2"></app-kpi-card>
         </div>
     </div>
 
-    <!-- Loading State -->
-    <ng-template #loading>
-        <div class="loading-container">
-            <mat-spinner></mat-spinner>
-            <p>Loading Dashboard...</p>
-        </div>
-    </ng-template>
+    <div class="charts-section">
+        <mat-card class="chart-card">
+            <mat-card-header>
+                <mat-card-title>Vehicle Entries vs Exits</mat-card-title>
+                <mat-card-subtitle>Weekly vehicle movement</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <canvas baseChart type="line" [data]="entryExitChartData" [options]="entryExitChartOptions"></canvas>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-card">
+            <mat-card-header>
+                <mat-card-title>Daily Weight Collected</mat-card-title>
+                <mat-card-subtitle>Weekly weight trend (Tons)</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <canvas baseChart type="line" [data]="weightTrendChartData" [options]="weightTrendChartOptions"></canvas>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-card pie-card">
+            <mat-card-header>
+                <mat-card-title>Vehicle Status</mat-card-title>
+                <mat-card-subtitle>Inside / Exited / Pending</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <canvas baseChart type="pie" [data]="statusPieData" [options]="statusPieOptions"></canvas>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <!-- Real-Time SCADA Journey section -->
+    <div class="scada-journey-section">
+        <mat-card class="scada-main-card">
+            <mat-card-header class="scada-header">
+                <div class="title-container">
+                    <mat-card-title>
+                        <mat-icon class="pulse-icon">online_prediction</mat-icon>
+                        SCADA Real-Time Journey Tracking
+                    </mat-card-title>
+                    <mat-card-subtitle>Live flow tracking from plant SCADA sensors and Weighbridge system</mat-card-subtitle>
+                </div>
+                <!-- Simulation control panel -->
+                <div class="sim-controls">
+                    <div class="input-group">
+                        <span class="sim-label">Truck Plate:</span>
+                        <input #plateInput type="text" [value]="simPlate" (input)="simPlate = plateInput.value" class="sim-input" placeholder="Plate Number" [disabled]="isSimulating">
+                    </div>
+                    <div class="input-group">
+                        <span class="sim-label">Weight (KG):</span>
+                        <input #weightInput type="number" [value]="simWeight" (input)="simWeight = +weightInput.value" class="sim-input weight-input" placeholder="Weight" [disabled]="isSimulating">
+                    </div>
+                    <button class="sim-btn" (click)="simulateVehicleJourney()" [disabled]="isSimulating">
+                        <mat-icon *ngIf="!isSimulating">play_circle</mat-icon>
+                        <span *ngIf="!isSimulating">Simulate Journey</span>
+                        <mat-spinner *ngIf="isSimulating" diameter="18" class="sim-spinner"></mat-spinner>
+                        <span *ngIf="isSimulating">Simulating...</span>
+                    </button>
+                </div>
+            </mat-card-header>
+
+            <mat-card-content>
+                <!-- Timeline/Stepper Component -->
+                <div class="timeline-container">
+                    <div class="timeline-track">
+                        <div class="timeline-progress" [style.width.%]="(journey.step > 0 ? (journey.step - 1) / 6 * 100 : 0)"></div>
+                    </div>
+                    <div class="timeline-steps">
+                        <div *ngFor="let step of timelineSteps" 
+                             class="timeline-step" 
+                             [class.active]="journey.step === step.stepNum" 
+                             [class.completed]="journey.step > step.stepNum"
+                             [class.pending]="journey.step < step.stepNum">
+                            <div class="step-circle">
+                                <mat-icon>{{ step.icon }}</mat-icon>
+                                <span class="step-check" *ngIf="journey.step > step.stepNum">
+                                    <mat-icon>check</mat-icon>
+                                </span>
+                                <span class="step-pulse" *ngIf="journey.step === step.stepNum"></span>
+                            </div>
+                            <span class="step-label">{{ step.label }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCADA Journey Status Cards Grid -->
+                <div class="scada-cards-grid">
+                    <!-- B. Vehicle Status Card -->
+                    <div class="scada-status-card glass-card vehicle-card">
+                        <div class="card-icon-container">
+                            <mat-icon>local_shipping</mat-icon>
+                        </div>
+                        <div class="card-details">
+                            <h3>Vehicle Status</h3>
+                            <div class="details-row">
+                                <span class="label">Truck Plate</span>
+                                <span class="value truck-plate">{{ journey.truckNumber }}</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="label">Status</span>
+                                <span class="value badge" [class.active-status]="journey.step > 0" [class.completed-status]="journey.journeyCompleted">
+                                    {{ journey.workflowStatus }}
+                                </span>
+                            </div>
+                            <div class="details-row">
+                                <span class="label">Location</span>
+                                <span class="value location-highlight">{{ journey.currentLocation }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- C. Weight Information Card -->
+                    <div class="scada-status-card glass-card weight-card">
+                        <div class="card-icon-container">
+                            <mat-icon>scale</mat-icon>
+                        </div>
+                        <div class="card-details">
+                            <h3>Weight Information</h3>
+                            <div class="details-row">
+                                <span class="label">Measured Weight</span>
+                                <span class="value weight-value">{{ journey.grossWeight | number }} KG</span>
+                            </div>
+                            <div class="details-row">
+                                <span class="label">Capture Status</span>
+                                <span class="value badge" [class.completed-status]="journey.weightCaptureStatus === 'Captured'">
+                                    {{ journey.weightCaptureStatus }}
+                                </span>
+                            </div>
+                            <div class="details-row">
+                                <span class="label">Capture Time</span>
+                                <span class="value">{{ journey.weightTimestamp ? (journey.weightTimestamp | date:'mediumTime') : '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D. Barrier Status Card -->
+                    <div class="scada-status-card glass-card barrier-card">
+                        <div class="card-icon-container">
+                            <mat-icon>door_sliding</mat-icon>
+                        </div>
+                        <div class="card-details">
+                            <h3>Boom Barriers</h3>
+                            <div class="details-row">
+                                <span class="label">Entry Barrier</span>
+                                <span class="value badge" [class.open-badge]="journey.entryBarrierStatus.toLowerCase() === 'open'" [class.closed-badge]="journey.entryBarrierStatus.toLowerCase() === 'closed'">
+                                    {{ journey.entryBarrierStatus | uppercase }}
+                                </span>
+                            </div>
+                            <div class="details-row">
+                                <span class="label">Exit Barrier</span>
+                                <span class="value badge" [class.open-badge]="journey.exitBarrierStatus.toLowerCase() === 'open'" [class.closed-badge]="journey.exitBarrierStatus.toLowerCase() === 'closed'">
+                                    {{ journey.exitBarrierStatus | uppercase }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- E. Signal Status Card -->
+                    <div class="scada-status-card glass-card signal-card">
+                        <div class="card-icon-container">
+                            <mat-icon>traffic</mat-icon>
+                        </div>
+                        <div class="card-details">
+                            <h3>Traffic Signals</h3>
+                            <div class="details-row">
+                                <span class="label">Entry Signal</span>
+                                <div class="signal-indicator">
+                                    <span class="signal-light red" [class.active]="journey.entrySignal.toLowerCase() === 'red'"></span>
+                                    <span class="signal-light green" [class.active]="journey.entrySignal.toLowerCase() === 'green'"></span>
+                                    <span class="signal-text">{{ journey.entrySignal }}</span>
+                                </div>
+                            </div>
+                            <div class="details-row">
+                                <span class="label">Exit Signal</span>
+                                <div class="signal-indicator">
+                                    <span class="signal-light red" [class.active]="journey.exitSignal.toLowerCase() === 'red'"></span>
+                                    <span class="signal-light green" [class.active]="journey.exitSignal.toLowerCase() === 'green'"></span>
+                                    <span class="signal-text">{{ journey.exitSignal }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- F. Audio Announcement Card -->
+                    <div class="scada-status-card glass-card announcement-card">
+                        <div class="card-icon-container">
+                            <mat-icon>volume_up</mat-icon>
+                        </div>
+                        <div class="card-details">
+                            <h3>Audio Announcement</h3>
+                            <div class="announcement-bubble">
+                                <p class="announcement-text">"{{ journey.currentAnnouncement }}"</p>
+                            </div>
+                            <div class="details-row mt-2">
+                                <span class="label">Last Announcement</span>
+                                <span class="value">{{ journey.lastAnnouncementTime ? (journey.lastAnnouncementTime | date:'mediumTime') : '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <div class="bottom-section">
+        <app-activity-table
+            class="activity-panel"
+            title="Recent Vehicle Activity"
+            subtitle="Latest entries and exits at Yanbu Cement plant"
+            [data]="activityTableData"
+            [columns]="['vehicleNo', 'driverName', 'entryTime', 'exitTime', 'status', 'netWeight']">
+        </app-activity-table>
+
+        <mat-card class="live-panel">
+            <mat-card-header>
+                <mat-card-title>
+                    <mat-icon>local_shipping</mat-icon>
+                    Live Current Truck Status
+                </mat-card-title>
+                <mat-card-subtitle>Real-time plant status</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="live-item">
+                    <span class="label">Current Truck</span>
+                    <span class="value truck">{{ liveStatus.currentTruck }}</span>
+                </div>
+                <div class="live-item">
+                    <span class="label">Current Weight</span>
+                    <span class="value">{{ liveStatus.currentWeight | number }} KG</span>
+                </div>
+                <div class="live-item">
+                    <span class="label">Entry Barrier</span>
+                    <span class="value" [class.open]="liveStatus.entryBarrier === 'OPEN'">{{ liveStatus.entryBarrier }}</span>
+                </div>
+                <div class="live-item">
+                    <span class="label">Exit Barrier</span>
+                    <span class="value" [class.open]="liveStatus.exitBarrier === 'OPEN'">{{ liveStatus.exitBarrier }}</span>
+                </div>
+                <div class="live-item">
+                    <span class="label">Vehicle Status</span>
+                    <span class="value status">{{ liveStatus.vehicleStatus }}</span>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
 </div>
+
+<ng-template #loading>
+    <div class="loading-container">
+        <mat-spinner></mat-spinner>
+        <p>Loading Dashboard...</p>
+    </div>
+</ng-template>

@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { catchError, delay, map } from 'rxjs/operators';
 import { Vehicle, VehicleStatus } from '../models/vehicle.model';
 import { PaginatedResponse } from '../models/api-response.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VehicleTrackingService {
+  private apiUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) {}
   
   private mockVehicles: Vehicle[] = [
     {
@@ -105,18 +110,61 @@ export class VehicleTrackingService {
   ];
 
   getVehicles(pageNumber: number = 1, pageSize: number = 10): Observable<PaginatedResponse<Vehicle>> {
-    const startIndex = (pageNumber - 1) * pageSize;
-    const paginatedData = this.mockVehicles.slice(startIndex, startIndex + pageSize);
-    
-    const response: PaginatedResponse<Vehicle> = {
-      data: paginatedData,
-      pageNumber,
-      pageSize,
-      totalCount: this.mockVehicles.length,
-      totalPages: Math.ceil(this.mockVehicles.length / pageSize)
+    return this.http.get<any>(`${this.apiUrl}/vehicles`).pipe(
+      map((response) => {
+        const all = (response.data || []).map((v: any) => this.mapVehicle(v));
+        const startIndex = (pageNumber - 1) * pageSize;
+        return {
+          data: all.slice(startIndex, startIndex + pageSize),
+          pageNumber,
+          pageSize,
+          totalCount: all.length,
+          totalPages: Math.ceil(all.length / pageSize)
+        };
+      }),
+      catchError(() => {
+        const startIndex = (pageNumber - 1) * pageSize;
+        const paginatedData = this.mockVehicles.slice(startIndex, startIndex + pageSize);
+        return of({
+          data: paginatedData,
+          pageNumber,
+          pageSize,
+          totalCount: this.mockVehicles.length,
+          totalPages: Math.ceil(this.mockVehicles.length / pageSize)
+        }).pipe(delay(500));
+      })
+    );
+  }
+
+  private mapVehicle(v: any): Vehicle {
+    return {
+      id: v.id,
+      vehicleNumber: v.vehicleNumber || v.plateNumber,
+      vehicleType: 'Truck',
+      driverName: v.driverName || '—',
+      driverPhone: '',
+      entryTime: new Date(v.entryTime),
+      exitTime: v.exitTime ? new Date(v.exitTime) : undefined,
+      status: this.mapStatus(v.status),
+      currentWeight: v.currentWeight || 0,
+      grossWeight: 0,
+      tareWeight: 0,
+      netWeight: v.currentWeight || 0,
+      currentLocation: v.status === 'INSIDE' ? 'Inside Plant' : v.status === 'PENDING' ? 'Entry Gate' : 'Exited',
+      entryBarrierStatus: true,
+      exitBarrierStatus: false,
+      createdAt: new Date(v.entryTime),
+      updatedAt: new Date()
     };
-    
-    return of(response).pipe(delay(500));
+  }
+
+  private mapStatus(status: string): VehicleStatus {
+    switch (status?.toUpperCase()) {
+      case 'INSIDE': return VehicleStatus.Entered;
+      case 'EXITED': return VehicleStatus.Exited;
+      case 'PENDING': return VehicleStatus.Pending;
+      default: return VehicleStatus.Pending;
+    }
   }
 
   getVehicleById(id: string): Observable<Vehicle> {

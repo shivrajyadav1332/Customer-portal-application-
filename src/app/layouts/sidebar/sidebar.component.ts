@@ -30,12 +30,10 @@ export class SidebarComponent {
     menuItems: MenuItem[] = [
         { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
         { label: 'Vehicles', icon: 'local_shipping', route: '/vehicles' },
-        { label: 'Reports', icon: 'scale', route: '/reports' },
-        { label: 'Live Monitoring', icon: 'monitor', route: '/live-monitoring' },
-        { label: 'Analytics', icon: 'analytics', route: '/analytics' },
-        { label: 'Notifications', icon: 'notifications', route: '/notifications' },
-        { label: 'Profile', icon: 'person', route: '/profile' },
-        { label: 'Settings', icon: 'settings', route: '/settings' }
+        { label: 'Weight Reports', icon: 'scale', route: '/reports' },
+        { label: 'Live Monitoring', icon: 'monitor_heart', route: '/live-monitoring' },
+        { label: 'Reports', icon: 'assessment', route: '/analytics' },
+        { label: 'Profile', icon: 'person', route: '/profile' }
     ];
 
     constructor(private router: Router) {

@@ -4,6 +4,14 @@ export interface LoginRequest {
   rememberMe?: boolean;
 }
 
+export interface SignupRequest {
+  username: string;
+  password: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 export interface LoginResponse {
   token: string;
   refreshToken: string;

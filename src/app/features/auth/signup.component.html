@@ -1,0 +1,48 @@
+<div class="signup-container">
+  <div class="signup-box">
+    <div class="signup-header">
+      <h1>Create Account</h1>
+      <p>Smart Gate System - Customer Portal</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
+      <mat-form-field class="full-width">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" placeholder="Choose a username" type="text" />
+        <mat-error *ngIf="signupForm.get('username')?.hasError('required')">Username is required</mat-error>
+        <mat-error *ngIf="signupForm.get('username')?.hasError('minlength')">Username must be at least 3 characters</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" placeholder="Enter your email" type="email" />
+        <mat-error *ngIf="signupForm.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="signupForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" placeholder="Create a password" type="password" />
+        <mat-error *ngIf="signupForm.get('password')?.hasError('required')">Password is required</mat-error>
+        <mat-error *ngIf="signupForm.get('password')?.hasError('minlength')">Password must be at least 6 characters</mat-error>
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="signup-button"
+        [disabled]="signupForm.invalid || isLoading"
+        type="submit"
+      >
+        <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+        <span *ngIf="!isLoading">Sign Up</span>
+        <span *ngIf="isLoading">Creating Account...</span>
+      </button>
+
+      <div class="signup-footer">
+        <span>Already have an account?</span>
+        <a (click)="goToLogin()" class="login-link">Sign In</a>
+      </div>
+    </form>
+  </div>
+</div>

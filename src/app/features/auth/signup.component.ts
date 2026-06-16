@@ -6,15 +6,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../core/services/auth.service';
-import { LoginRequest } from '../../core/models/auth.model';
+import { SignupRequest } from '../../core/models/auth.model';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-signup',
   standalone: true,
   imports: [
     CommonModule,
@@ -23,16 +21,14 @@ import { LoginRequest } from '../../core/models/auth.model';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
-    MatIconModule
+    MatProgressSpinnerModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class SignupComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -40,70 +36,51 @@ export class LoginComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
 
-  loginForm!: FormGroup;
+  signupForm!: FormGroup;
   isLoading = false;
-  showPassword = false;
 
   ngOnInit(): void {
-    this.initializeForm();
-    // If already logged in, redirect to dashboard
+    this.signupForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      firstName: [''],
+      lastName: ['']
+    });
+
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
     }
   }
 
-  private initializeForm(): void {
-    this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
-    });
-  }
-
   onSubmit(): void {
-    if (this.loginForm.invalid) {
+    if (this.signupForm.invalid) {
       return;
     }
 
     this.isLoading = true;
     this.cdr.markForCheck();
-    const credentials: LoginRequest = this.loginForm.value;
+    const details: SignupRequest = this.signupForm.value;
 
-    this.authService.login(credentials).subscribe({
-      next: (response) => {
-        this.toastr.success('Login successful!', 'Success');
+    this.authService.signup(details).subscribe({
+      next: () => {
+        this.toastr.success('Account created successfully!', 'Success');
         this.isLoading = false;
         this.cdr.markForCheck();
-
-        const redirectUrl = sessionStorage.getItem('redirectUrl');
-        sessionStorage.removeItem('redirectUrl');
-
-        this.ngZone.run(() => {
-          this.router.navigate([redirectUrl || '/dashboard']);
-        });
+        this.ngZone.run(() => this.router.navigate(['/dashboard']));
       },
       error: (error) => {
         this.ngZone.run(() => {
-          console.error('Login error:', error);
           this.isLoading = false;
           this.cdr.markForCheck();
-          const errorMessage = error.error?.message || error.message || 'Login failed';
+          const errorMessage = error.error?.message || error.message || 'Signup failed';
           this.toastr.error(errorMessage, 'Error');
         });
       }
     });
   }
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
-    this.cdr.markForCheck();
-  }
-
-  goToForgotPassword(): void {
-    this.router.navigate(['/forgot-password']);
-  }
-
-  goToSignup(): void {
-    this.router.navigate(['/signup']);
+  goToLogin(): void {
+    this.router.navigate(['/login']);
   }
 }

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { LoginRequest, LoginResponse, UserInfo } from '../models/auth.model';
+import { tap } from 'rxjs/operators';
+import { LoginRequest, LoginResponse, SignupRequest, UserInfo } from '../models/auth.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -25,7 +26,26 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials);
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+      tap((response: LoginResponse) => this.handleAuthResponse(response))
+    );
+  }
+
+  signup(details: SignupRequest): Observable<LoginResponse> {
+    return this.http.post<any>(`${this.apiUrl}/signup`, details).pipe(
+      tap((response: LoginResponse) => this.handleAuthResponse(response))
+    );
+  }
+
+  private handleAuthResponse(response: LoginResponse): void {
+    if (response && response.token) {
+      this.storeToken(response.token, response.refreshToken, response.expiresIn);
+      if (response.user) {
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        this.currentUserSubject.next(response.user);
+      }
+      this.isAuthenticatedSubject.next(true);
+    }
   }
 
   logout(): void {

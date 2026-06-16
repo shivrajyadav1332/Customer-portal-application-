@@ -27,12 +27,41 @@ export class SignalRService {
   private liveLogsSubject = new BehaviorSubject<any[]>([]);
   public liveLogs$ = this.liveLogsSubject.asObservable();
 
+  // SCADA Journey Event Stream
+  private journeySubject = new BehaviorSubject<{ eventName: string; payload: any } | null>(null);
+  public journey$ = this.journeySubject.asObservable();
+
   startConnection(): Observable<void> {
     return new Observable(observer => {
-      // Mock SignalR - just complete immediately without connecting
-      console.log('SignalR connection disabled (using mock mode)');
-      observer.next();
-      observer.complete();
+      if (this.hubConnection) {
+        observer.next();
+        observer.complete();
+        return;
+      }
+
+      const hubUrl = `${environment.signalRUrl}/hub/vehicle`;
+      console.log(`Connecting to SCADA Hub at: ${hubUrl}`);
+
+      this.hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl(hubUrl)
+        .withAutomaticReconnect()
+        .build();
+
+      this.hubConnection.start()
+        .then(() => {
+          console.log('SignalR connection established successfully');
+          this.connectionSubject.next(true);
+          this.setupEventListeners();
+          observer.next();
+          observer.complete();
+        })
+        .catch((error: any) => {
+          console.error('Error starting SignalR connection:', error);
+          this.connectionSubject.next(false);
+          // Proceed anyway to allow local mock triggers/simulators on the dashboard
+          observer.next();
+          observer.complete();
+        });
     });
   }
 
@@ -59,43 +88,126 @@ export class SignalRService {
     }
 
     // Remove existing listeners to avoid duplicates
-    this.hubConnection.off('VehicleUpdated');
-    this.hubConnection.off('NotificationReceived');
-    this.hubConnection.off('LiveLogAdded');
-    this.hubConnection.off('BarrierStatusChanged');
-    this.hubConnection.off('WeightUpdated');
+    const events = [
+      'VehicleUpdated', 'NotificationReceived', 'LiveLogAdded', 'BarrierStatusChanged', 'WeightUpdated',
+      'VehicleDetected', 'ANPRScanned', 'EntryBarrierOpened', 'TruckEnteredWeighbridge', 'WeightCaptured',
+      'ExitBarrierOpened', 'TruckExited', 'ProcessCompleted',
+      'ReceiveSystemStatus', 'SystemStateChanged', 'DeviceEvent', 'EntryBarrierChanged', 'ExitBarrierChanged',
+      'EntrySignalChanged', 'ExitSignalChanged', 'OnScaleChanged', 'VehicleProcessed'
+    ];
+    for (const event of events) {
+      this.hubConnection.off(event);
+    }
 
-    // Vehicle Update Event
+    // 1. Specific journey events (emitted directly by future components)
+    this.hubConnection.on('VehicleDetected', (payload: any) => {
+      console.log('SignalR Event: VehicleDetected', payload);
+      this.journeySubject.next({ eventName: 'VehicleDetected', payload });
+    });
+
+    this.hubConnection.on('ANPRScanned', (payload: any) => {
+      console.log('SignalR Event: ANPRScanned', payload);
+      this.journeySubject.next({ eventName: 'ANPRScanned', payload });
+    });
+
+    this.hubConnection.on('EntryBarrierOpened', (payload: any) => {
+      console.log('SignalR Event: EntryBarrierOpened', payload);
+      this.journeySubject.next({ eventName: 'EntryBarrierOpened', payload });
+    });
+
+    this.hubConnection.on('TruckEnteredWeighbridge', (payload: any) => {
+      console.log('SignalR Event: TruckEnteredWeighbridge', payload);
+      this.journeySubject.next({ eventName: 'TruckEnteredWeighbridge', payload });
+    });
+
+    this.hubConnection.on('WeightCaptured', (payload: any) => {
+      console.log('SignalR Event: WeightCaptured', payload);
+      this.journeySubject.next({ eventName: 'WeightCaptured', payload });
+    });
+
+    this.hubConnection.on('ExitBarrierOpened', (payload: any) => {
+      console.log('SignalR Event: ExitBarrierOpened', payload);
+      this.journeySubject.next({ eventName: 'ExitBarrierOpened', payload });
+    });
+
+    this.hubConnection.on('TruckExited', (payload: any) => {
+      console.log('SignalR Event: TruckExited', payload);
+      this.journeySubject.next({ eventName: 'TruckExited', payload });
+    });
+
+    this.hubConnection.on('ProcessCompleted', (payload: any) => {
+      console.log('SignalR Event: ProcessCompleted', payload);
+      this.journeySubject.next({ eventName: 'ProcessCompleted', payload });
+    });
+
+    // 2. SCADA standard status updates (emitted by C# backend)
+    this.hubConnection.on('ReceiveSystemStatus', (payload: any) => {
+      console.log('SignalR SCADA ReceiveSystemStatus:', payload);
+      this.mapScadaStateToJourney(payload);
+    });
+
+    this.hubConnection.on('SystemStateChanged', (payload: any) => {
+      console.log('SignalR SCADA SystemStateChanged:', payload);
+      this.mapScadaStateToJourney(payload);
+    });
+
+    this.hubConnection.on('DeviceEvent', (payload: any) => {
+      console.log('SignalR SCADA DeviceEvent:', payload);
+      const ev = (payload.event || payload.eventName || '').toUpperCase();
+      if (ev === 'VEHICLE_ENTRY') {
+        this.journeySubject.next({ eventName: 'VehicleDetected', payload });
+      } else if (ev === 'WEIGHING') {
+        this.journeySubject.next({ eventName: 'TruckEnteredWeighbridge', payload });
+      } else if (ev === 'WEIGH_COMPLETE') {
+        this.journeySubject.next({ eventName: 'WeightCaptured', payload: { weight: payload.weight || 27500 } });
+      } else if (ev === 'EXIT_OPEN') {
+        this.journeySubject.next({ eventName: 'ExitBarrierOpened', payload });
+      } else if (ev === 'EXIT_CLOSE') {
+        this.journeySubject.next({ eventName: 'TruckExited', payload });
+        this.journeySubject.next({ eventName: 'ProcessCompleted', payload });
+      }
+    });
+
+    this.hubConnection.on('OnScaleChanged', (val: any) => {
+      console.log('SignalR SCADA OnScaleChanged:', val);
+      if (val) {
+        this.journeySubject.next({ eventName: 'TruckEnteredWeighbridge', payload: { onScale: true } });
+      }
+    });
+
+    this.hubConnection.on('VehicleProcessed', (payload: any) => {
+      console.log('SignalR SCADA VehicleProcessed:', payload);
+      if (payload.status === 'ACCEPTED') {
+        this.journeySubject.next({ eventName: 'VehicleDetected', payload });
+        this.journeySubject.next({ eventName: 'ANPRScanned', payload });
+      }
+    });
+
+    // Legacy handlers
     this.hubConnection.on('VehicleUpdated', (update: LiveVehicleUpdate) => {
       try {
-        console.log('Vehicle updated:', update);
         this.liveVehicleUpdateSubject.next(update);
       } catch (error: any) {
         console.error('Error processing VehicleUpdated event:', error);
       }
     });
 
-    // Notification Event
     this.hubConnection.on('NotificationReceived', (notification: Notification) => {
       try {
-        console.log('Notification received:', notification);
         this.notificationSubject.next(notification);
       } catch (error: any) {
         console.error('Error processing NotificationReceived event:', error);
       }
     });
 
-    // Live Log Event
     this.hubConnection.on('LiveLogAdded', (logs: any[]) => {
       try {
-        console.log('Live logs received:', logs);
         this.liveLogsSubject.next(logs);
       } catch (error: any) {
         console.error('Error processing LiveLogAdded event:', error);
       }
     });
 
-    // Barrier Status Event
     this.hubConnection.on('BarrierStatusChanged', (data: any) => {
       try {
         console.log('Barrier status changed:', data);
@@ -104,7 +216,6 @@ export class SignalRService {
       }
     });
 
-    // Weight Update Event
     this.hubConnection.on('WeightUpdated', (data: any) => {
       try {
         console.log('Weight updated:', data);
@@ -113,6 +224,36 @@ export class SignalRService {
       }
     });
   }
+
+  private mapScadaStateToJourney(payload: any): void {
+    if (!payload) return;
+    const stage = (payload.stage || '').toUpperCase();
+    const plate = payload.currentTruckPlate || payload.plate || '';
+    const weight = payload.currentWeight || payload.weight || 0;
+
+    if (payload.ledMessage) {
+      this.journeySubject.next({ eventName: 'AudioAnnouncement', payload: { announcement: payload.ledMessage, timestamp: new Date() } });
+    }
+
+    if (stage === 'ENTRY' || stage === 'VEHICLE_ENTRY') {
+      this.journeySubject.next({ eventName: 'VehicleDetected', payload: { plate, time: new Date() } });
+      this.journeySubject.next({ eventName: 'ANPRScanned', payload: { plate, status: 'Verified' } });
+      if (payload.entryBarrier === 'OPEN') {
+        this.journeySubject.next({ eventName: 'EntryBarrierOpened', payload: { barrier: 'OPEN', signal: 'GREEN' } });
+      }
+    } else if (stage === 'WEIGHING') {
+      this.journeySubject.next({ eventName: 'TruckEnteredWeighbridge', payload: { location: 'Weighbridge' } });
+    } else if (stage === 'WEIGHT_CALCULATED' || stage === 'WEIGH_COMPLETE') {
+      this.journeySubject.next({ eventName: 'WeightCaptured', payload: { weight, timestamp: new Date() } });
+    } else if (stage === 'EXIT' || stage === 'EXIT_OPEN') {
+      this.journeySubject.next({ eventName: 'ExitBarrierOpened', payload: { barrier: 'OPEN', signal: 'GREEN' } });
+    } else if (stage === 'IDLE' || stage === 'READY') {
+      this.journeySubject.next({ eventName: 'TruckExited', payload: { exitTime: new Date() } });
+      this.journeySubject.next({ eventName: 'ProcessCompleted', payload: {} });
+    }
+  }
+
+
 
   joinVehicleGroup(vehicleId: string): Promise<void> {
     if (!this.hubConnection) {
